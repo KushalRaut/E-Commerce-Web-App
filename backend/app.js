@@ -17,7 +17,6 @@ app.use("/api/user", auth);
 app.use("/api/v1", order);
 
 
-//middleware to handle errors
-app.use(errorMiddleware);
+
 
 module.exports = app;
