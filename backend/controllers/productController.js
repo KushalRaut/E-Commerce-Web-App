@@ -1,7 +1,10 @@
 const Product = require("../models/product");
 const APIFeatures = require("../utils/apiFeatures");
 
-exports.newProduct = async (req, res, next) => {
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
+
+exports.newProduct = catchAsyncErrors(async (req, res, next) => {
   req.body.user = req.user.id;
   const product = await Product.create(req.body);
 
@@ -9,9 +12,9 @@ exports.newProduct = async (req, res, next) => {
     success: true,
     product,
   });
-};
+});
 
-exports.getProducts = async (req, res, next) => {
+exports.getProducts = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 8;
   const productsCount = await Product.count();
 
@@ -25,27 +28,25 @@ exports.getProducts = async (req, res, next) => {
   res.status(200).json({
     success: true,
     productsCount,
+    resultsPerPage,
     products,
   });
-};
+});
 
-exports.getOneProduct = async (req, res, next) => {
+exports.getOneProduct = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 
   if (!product) {
-    return res.status(404).json({
-      success: false,
-      message: "Product not found",
-    });
+    return next(new ErrorHandler("Product not found", 404));
   }
 
   res.status(200).json({
     success: true,
     product,
   });
-};
+});
 
-exports.updateProduct = async (req, res, next) => {
+exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -64,9 +65,9 @@ exports.updateProduct = async (req, res, next) => {
     message: "updated successfully",
     product,
   });
-};
+});
 
-exports.deleteProduct = async (req, res, next) => {
+exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -81,11 +82,11 @@ exports.deleteProduct = async (req, res, next) => {
       message: "The product was deleted successfully",
     });
   }
-};
+});
 
 //create new review => /api/v1/review
 
-exports.createProductReview = async (req, res, next) => {
+exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
   const { ratings, comment, productId } = req.body;
 
   const review = {
@@ -120,10 +121,10 @@ exports.createProductReview = async (req, res, next) => {
   await product.save({ validateBeforeSave: false });
 
   res.status(200).json({ success: true });
-};
+});
 
 // Get product reviews => /api/v1/reviews
-exports.getAllReviews = async (req, res, next) => {
+exports.getAllReviews = catchAsyncErrors(async (req, res, next) => {
   const productId = req.query.id;
 
   const product = await Product.findById(productId);
@@ -135,10 +136,10 @@ exports.getAllReviews = async (req, res, next) => {
   }
 
   res.status(200).json({ success: true, reviews: product.reviews });
-};
+});
 
 // Delete Product Review   =>   /api/v1/reviews
-exports.deleteReview = async (req, res, next) => {
+exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.productId);
 
   console.log(product);
@@ -169,4 +170,4 @@ exports.deleteReview = async (req, res, next) => {
   res.status(200).json({
     success: true,
   });
-};
+});

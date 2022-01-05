@@ -33,6 +33,7 @@ const ProductDetails = ({ match }) => {
         <Loader />
       ) : (
         <Fragment>
+          <MetaData title={product.name} />
           <div className="container container-fluid">
             <div className="row f-flex justify-content-around">
               <div className="col-12 col-lg-5 img-fluid" id="product_image">
@@ -91,7 +92,10 @@ const ProductDetails = ({ match }) => {
 
                 <p>
                   Status:{" "}
-                  <span id="stock_status" className={product.stock>0?'greenColor':'redColor'}>
+                  <span
+                    id="stock_status"
+                    className={product.stock > 0 ? "greenColor" : "redColor"}
+                  >
                     {product.stock > 0 ? "In Stock" : "Out of stock"}
                   </span>
                 </p>

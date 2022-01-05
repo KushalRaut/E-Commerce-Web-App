@@ -2,10 +2,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const errorMiddleware = require("./middlewares/errors");
-const cookieParser= require("cookie-parser");
+const cookieParser = require("cookie-parser");
 
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 //Import all routes
 const products = require("./routes/product");
 const auth = require("./routes/auth");
@@ -16,7 +16,7 @@ app.use("/api/v1", products);
 app.use("/api/user", auth);
 app.use("/api/v1", order);
 
-
-
+// Middleware to handle errors
+app.use(errorMiddleware);
 
 module.exports = app;
