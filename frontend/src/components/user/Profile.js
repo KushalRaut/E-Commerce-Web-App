@@ -26,7 +26,7 @@ const Profile = () => {
                 />
               </figure>
               <Link
-                to="#"
+                to="/me/update"
                 id="edit_profile"
                 className="btn btn-primary btn-block my-5"
               >
@@ -51,7 +51,7 @@ const Profile = () => {
               )}
 
               <Link
-                to="/password/update"
+                to="/me/password/update"
                 className="btn btn-primary btn-block mt-3"
               >
                 Change Password
