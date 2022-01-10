@@ -15,6 +15,7 @@ const Header = () => {
   const { user, loading } = useSelector((state) => state.auth)
   // const { cartItems } = useSelector((state) => state.cart)
 
+  const { cartItems } = useSelector((state) => state.cart)
   const logoutHandler = () => {
     dispatch(logoutUser())
     alert.success('Logged out successfully.')
@@ -41,7 +42,7 @@ const Header = () => {
               Cart
             </span>
             <span className="ml-1" id="cart_count">
-              2
+              {cartItems.length}
             </span>
           </Link>
 
