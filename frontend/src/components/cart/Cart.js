@@ -1,30 +1,15 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 import MetaData from '../layouts/MetaData'
 
-import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { addItemToCart, removeItemFromCart } from '../../actions/cartActions'
 
-const Cart = () => {
+const Cart = ({ history }) => {
   const dispatch = useDispatch()
 
   const { cartItems } = useSelector((state) => state.cart)
-
-  const [totalItems, setTotalItems] = useState(0)
-  const [totalPrice, setTotalPrice] = useState(0)
-
-  useEffect(() => {
-    let items = 0
-    let itemsPrice = 0
-    cartItems.map((item) => {
-      items = items + item.quantity
-      itemsPrice = itemsPrice + item.price*item.quantity
-    })
-    setTotalItems(items)
-    setTotalPrice(itemsPrice)
-  }, [cartItems])
 
   const removeCartItemHandler = (id) => {
     dispatch(removeItemFromCart(id))
@@ -41,9 +26,13 @@ const Cart = () => {
   const decreaseQty = (id, quantity) => {
     const newQty = quantity - 1
 
-    if (newQty <= 1) return
+    if (newQty < 1) return
 
     dispatch(addItemToCart(id, newQty))
+  }
+
+  const checkoutHandler = () => {
+    history.push('/login?redirect=shipping')
   }
 
   return (
@@ -136,15 +125,33 @@ const Cart = () => {
                 <hr />
                 <p>
                   Subtotal:{' '}
-                  <span className="order-summary-values">{totalItems} (Units)</span>
+                  <span className="order-summary-values">
+                    {cartItems.reduce(
+                      (acc, item) => acc + Number(item.quantity),
+                      0
+                    )}{' '}
+                    (Units)
+                  </span>
                 </p>
                 <p>
                   Est. total:{' '}
-                  <span className="order-summary-values">${totalPrice}</span>
+                  <span className="order-summary-values">
+                    $
+                    {cartItems
+                      .reduce(
+                        (acc, item) => acc + Number(item.price * item.quantity),
+                        0
+                      )
+                      .toFixed(2)}
+                  </span>
                 </p>
 
                 <hr />
-                <button id="checkout_btn" className="btn btn-primary btn-block">
+                <button
+                  id="checkout_btn"
+                  className="btn btn-primary btn-block"
+                  onClick={checkoutHandler}
+                >
                   Check out
                 </button>
               </div>
