@@ -13,6 +13,8 @@ import Shipping from './components/cart/Shipping'
 import ConfirmOrder from './components/cart/ConfirmOrder'
 import Payment from './components/cart/Payment'
 import OrderSuccess from './components/cart/OrderSuccess'
+import ListOrders from './components/order/ListOrders'
+import OrderDetails from './components/order/OrderDetails'
 
 import Login from './components/user/Login'
 import Register from './components/user/Register'
@@ -26,7 +28,7 @@ import NewPassword from './components/user/NewPassword'
 import ProtectedRoute from './components/route/ProtectedRoute'
 
 //payment
-import {Elements } from '@stripe/react-stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 
 function App() {
@@ -69,6 +71,8 @@ function App() {
           <Route path="/password/reset/:token" component={NewPassword} />
           <ProtectedRoute path="/me" component={Profile} exact />
           <ProtectedRoute path="/me/update" component={UpdateProfile} />
+          <ProtectedRoute path="/orders/me" component={ListOrders} />
+          <ProtectedRoute path="/order/:id" component={OrderDetails} />
           <ProtectedRoute
             path="/me/password/update"
             component={UpdatePassword}
