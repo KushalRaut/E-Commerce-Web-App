@@ -76,15 +76,15 @@ const productSchema = new mongoose.Schema({
       },
       name: {
         type: String,
-        required: true,
+        required: false,
       },
       rating: {
         type: Number,
-        required: true,
+        required: false,
       },
       comment: {
         type: String,
-        required: true,
+        required: false,
       },
     },
   ],

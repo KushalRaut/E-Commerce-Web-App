@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 import './App.css'
 import Header from './components/layouts/Header'
@@ -15,6 +16,17 @@ import Payment from './components/cart/Payment'
 import OrderSuccess from './components/cart/OrderSuccess'
 import ListOrders from './components/order/ListOrders'
 import OrderDetails from './components/order/OrderDetails'
+
+//Admin imports
+import Dashboard from './components/admin/Dashboard'
+import ProductList from './components/admin/ProductList'
+import NewProduct from './components/admin/NewProduct'
+import UpdateProduct from './components/admin/UpdateProduct'
+import OrderList from './components/admin/OrderList'
+import ProcessOrder from './components/admin/ProcessOrder'
+import UsersList from './components/admin/UsersList'
+import UpdateUser from './components/admin/UpdateUser'
+import ProductReviews from './components/admin/ProductReviews'
 
 import Login from './components/user/Login'
 import Register from './components/user/Register'
@@ -34,6 +46,8 @@ import { loadStripe } from '@stripe/stripe-js'
 function App() {
   const [stripeApiKey, setStripeApiKey] = useState('')
 
+  const { user, isAuthenticated, loading } = useSelector(state => state.auth)
+
   useEffect(() => {
     store.dispatch(loadUser())
 
@@ -45,7 +59,6 @@ function App() {
     getStripeApiKey()
   }, [])
 
-  console.log(stripeApiKey)
   return (
     <Router>
       <div className="App">
@@ -78,7 +91,61 @@ function App() {
             component={UpdatePassword}
           />
         </div>
-        <Footer />
+        <ProtectedRoute
+          path="/dashboard"
+          isAdmin={true}
+          component={Dashboard}
+        />
+        <ProtectedRoute
+          path="/admin/products"
+          isAdmin={true}
+          component={ProductList}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/product"
+          isAdmin={true}
+          component={NewProduct}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/product/:id"
+          isAdmin={true}
+          component={UpdateProduct}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/orders"
+          isAdmin={true}
+          component={OrderList}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/order/:id"
+          isAdmin={true}
+          component={ProcessOrder}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/users"
+          isAdmin={true}
+          component={UsersList}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/user/:id"
+          isAdmin={true}
+          component={UpdateUser}
+          exact
+        />
+        <ProtectedRoute
+          path="/admin/reviews"
+          isAdmin={true}
+          component={ProductReviews}
+          exact
+        />
+
+        {!loading && (!isAuthenticated || user.role !== 'admin') && <Footer />}
       </div>
     </Router>
   )

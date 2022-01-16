@@ -3,8 +3,30 @@ const APIFeatures = require('../utils/apiFeatures')
 
 const ErrorHandler = require('../utils/errorHandler')
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors')
+const cloudinary = require('cloudinary')
 
 exports.newProduct = catchAsyncErrors(async (req, res, next) => {
+  let images = []
+  if (typeof req.body.images === 'string') {
+    images.push(req.body.images)
+  } else {
+    images = req.body.images
+  }
+
+  let imagesLinks = []
+
+  for (let i = 0; i < images.length; i++) {
+    const result = await cloudinary.v2.uploader.upload(images[i], {
+      folder: 'products',
+    })
+
+    imagesLinks.push({
+      public_id: result.public_id,
+      url: result.secure_url,
+    })
+  }
+
+  req.body.images = imagesLinks
   req.body.user = req.user.id
   const product = await Product.create(req.body)
 
@@ -14,6 +36,7 @@ exports.newProduct = catchAsyncErrors(async (req, res, next) => {
   })
 })
 
+// get all the products for user
 exports.getProducts = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 8
   const productsCount = await Product.count()
@@ -76,13 +99,21 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
       success: false,
       message: 'the product was not found',
     })
-  } else {
-    await product.deleteOne()
-    res.status(200).json({
-      success: true,
-      message: 'The product was deleted successfully',
-    })
   }
+
+
+  //Deleting images associated with the product
+  for (let i = 0; i < product.images.length; i++) {
+    await cloudinary.v2.uploader.destroy(
+      product.images[i].public_id
+    )
+  }
+
+  await product.deleteOne()
+  res.status(200).json({
+    success: true,
+    message: 'The product was deleted successfully',
+  })
 })
 
 //create new review => /api/v1/review
@@ -143,7 +174,6 @@ exports.getAllReviews = catchAsyncErrors(async (req, res, next) => {
 exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.productId)
 
-  console.log(product)
 
   const reviews = product.reviews.filter(
     (review) => review._id.toString() !== req.query.id.toString()
@@ -170,5 +200,15 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+  })
+})
+
+//get all the products for admin => /api/v1/admin/products
+exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
+  const products = await Product.find()
+
+  res.status(200).json({
+    success: true,
+    products,
   })
 })
